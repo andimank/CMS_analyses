@@ -140,8 +140,8 @@ AnaAvgCos::AnaAvgCos(const edm::ParameterSet& iConfig) :
   const Int_t nHarmonic = 12;
 
   int navgcosbin = 100;
-  int avgcosbinLow = -1;
-  int avgcosbinHigh = 1;
+  int avgcosbinLow = -10;
+  int avgcosbinHigh = 10;
 
   int Multbin = 10000;
   int nMultbin = 3;
@@ -202,7 +202,6 @@ AnaAvgCos::AnaAvgCos(const edm::ParameterSet& iConfig) :
 							  97, 0.3, 10.0);
 
   }
-
 
   hMultAsso           = fGlobalHist.make<TH1I>("hMultAsso",
 					     Form("%1.1f < p_{T} < %1.1f GeV/c", pTmin_trg, pTmax_trg),
@@ -332,301 +331,222 @@ AnaAvgCos::AnaAvgCos(const edm::ParameterSet& iConfig) :
   double minPhi = -(TMath::Pi() - phiW)/2.0;
   double maxPhi = (TMath::Pi() * 3.0 - phiW)/2.0;
 
+
+
+  //For Signal-------------
   TFileDirectory fSignalHist      = fs->mkdir("Signal");
 
   if(fIsMC){
-
-
     hSignal_all_GEN = fSignalHist.make<TH2D>("signal_all_Gen",
-					  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					       pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					  nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
-
-
+					            Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+					            pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+					            nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
     for(unsigned int i = 0; i<nptBin_; i++)
       {
-	hSignal_all_ptbin_GEN[i] = fSignalHist.make<TH2D>(Form("signal_all_ptbin%d_Gen",i),
-							  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-							       //pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-							       ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
-							  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+      	hSignal_all_ptbin_GEN[i] = fSignalHist.make<TH2D>(Form("signal_all_ptbin%d_Gen",i),
+      							               Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+      							               //pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+      							               ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
+      							               nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
       }
+  }
 
-    /*
-    hSignalPPGen = fSignalHist.make<TH2D>("signal_PP_Gen",
-				       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					    pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				       nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
+  //////////////// Define Reco (not efficiency-corrected) Signal Histograms ////////////////
 
-    hSignalPMGen = fSignalHist.make<TH2D>("signal_PM_Gen",
-				       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					    pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				       nEtaBins + 1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
-    hSignalMPGen = fSignalHist.make<TH2D>("signal_MP_Gen",
-				       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					    pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				       nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi);
-
-    hSignalMMGen = fSignalHist.make<TH2D>("signal_MM_Gen",
-				       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					    pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				       nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi);
-    */
- }
-
-  /*
-  hSignalPP = fSignalHist.make<TH2D>("signal_PP_reco",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
-
-  hSignalPM = fSignalHist.make<TH2D>("signal_PM_reco",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins + 1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
-  hSignalMP = fSignalHist.make<TH2D>("signal_MP_reco",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi);
-
-  hSignalMM = fSignalHist.make<TH2D>("signal_MM_reco",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi);
-  */
-
+  // Correlation function histogram
   hSignal_all = fSignalHist.make<TH2D>("signal_all_reco",
-					    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						 pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					    nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
+					      Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+						    pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+					      nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
 
+  // Correlation function pT-binned histograms
   // for(unsigned int i = 0; i<nptBin_; i++)
   //   {
   //     hSignal_all_ptbin[i] = fSignalHist.make<TH2D>(Form("signal_all_ptbin%d_reco",i),
 	// 						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-	// 							 //pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-	// 							 ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
+	// 							  //pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+	// 							  ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
 	// 						    nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
   //   }
 
-
-
+  // Average-cosine event-average histograms
   for(unsigned int i = 2; i<nHarmonic+1; i++)
     {
-      hSignal_all_evtavgcos_n_[i] = fSignalHist.make<TH1D>(Form("signal_all_evtavgcos_n_%d_reco",i),
-  						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
-  							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-  						    navgcosbin, avgcosbinLow, avgcosbinHigh);
+      hSignal_all_reco_evtavgcos_n_[i] = fSignalHist.make<TH1D>(Form("signal_all_reco_evtavgcos_n_%d",i),
+                    						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+                    							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+                    						    navgcosbin, avgcosbinLow, avgcosbinHigh);
     }
 
-    for(unsigned int i = 2; i<nHarmonic+1; i++)
-      {
-        hEVENT_signal_evtavgcos_n_[i] = fSignalHist.make<TH1D>(Form("signal_EVENT_evtavgcos_n_%d_reco",i),
-    						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
-    							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-    						    navgcosbin, avgcosbinLow, avgcosbinHigh);
-      }
+  // Average-cosine particle-average temporary histograms
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hEVENT_signal_reco_evtavgcos_n_[i] = new TH1D(Form("signal_EVENT_reco_evtavgcos_n_%d",i), //fSignalHist.make
+                      						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+                      							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+                      						    navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
 
-  /*
-  //reco corrected
-  hSignalPP_corr = fSignalHist.make<TH2D>("signal_PP_recocor",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
+  //////////////// Define Recocor (efficiency-corrected) Signal Histograms ////////////////
 
-  hSignalPM_corr = fSignalHist.make<TH2D>("signal_PM_recocor",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins + 1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
-  hSignalMP_corr = fSignalHist.make<TH2D>("signal_MP_recocor",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi);
-
-  hSignalMM_corr = fSignalHist.make<TH2D>("signal_MM_recocor",
-				     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-					  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-				     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi);
-  */
-
+  // Correlation function histogram
   hSignal_all_corr = fSignalHist.make<TH2D>("signal_all_recocor",
-					    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						 pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					    nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
+    					       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+    						     pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+    					       nEtaBins+1, minEta, maxEta, nPhiBins-1, minPhi, maxPhi);
 
-
+  // Correlation function pT-binned histograms
   // for(unsigned int i = 0; i<nptBin_; i++)
   //   {
   //     hSignal_all_ptbin_corr[i] = fSignalHist.make<TH2D>(Form("signal_all_ptbin%d_recocor",i),
-	// 					    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-	// 						 //pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-	// 						 ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
-	// 					    nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+	// 					                       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+	// 						                     //pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+	// 						                     ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
+	// 					                       nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
   //   }
 
+  // Average-cosine event-average histograms
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hSignal_all_recocor_evtavgcos_n_[i] = fSignalHist.make<TH1D>(Form("signal_all_recocor_evtavgcos_n_%d",i),
+                    						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+                    							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+                    						    navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
 
-  /*
-  hsig_PM_dphi_eff = fSignalHist.make<TProfile>("hsig_PM_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
-  hsig_MP_dphi_eff = fSignalHist.make<TProfile>("hsig_MP_dphi_eff","", nPhiBins - 1, minPhi, maxPhi,  0., 2.);
-  hsig_MM_dphi_eff = fSignalHist.make<TProfile>("hsig_MM_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
-  hsig_PP_dphi_eff = fSignalHist.make<TProfile>("hsig_PP_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
+  // Average-cosine particle-average temporary histograms
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hEVENT_signal_recocor_evtavgcos_n_[i] = new TH1D(Form("signal_EVENT_recocor_evtavgcos_n_%d",i), //fSignalHist.make
+                      						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+                      							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+                      						    navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
 
 
-  hsig_PM_dphi_eff = fSignalHist.make<TProfile2D>("hsig_PM_dphi_eff", " ", nEtaBins+1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi,  0.,  1.);
-  hsig_MP_dphi_eff = fSignalHist.make<TProfile2D>("hsig_MP_dphi_eff", " ", nEtaBins+1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi,  0.,  1.);
-  hsig_MM_dphi_eff = fSignalHist.make<TProfile2D>("hsig_MM_dphi_eff", " ", nEtaBins+1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi,  0.,  1.);
-  hsig_PP_dphi_eff = fSignalHist.make<TProfile2D>("hsig_PP_dphi_eff", " ", nEtaBins+1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi,  0.,  1.);
-  */
+  //-------------------------------------------------------------------------------------
 
   //For Background-------------
   TFileDirectory fBackgroundHist  = fs->mkdir("Background");
 
   if(fIsMC){
-
     hBackground_allGen = fBackgroundHist.make<TH2D>("background_all_Gen",
-                                                  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-                                                       pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-                                                  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+                         Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+                         pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+                         nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
 
     for(unsigned int i = 0; i<nptBin_; i++)
       {
-	hBackground_all_ptbin_Gen[i] = fBackgroundHist.make<TH2D>(Form("background_all_ptbin%d_Gen",i),
-								  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-								       ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
-								  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+	      hBackground_all_ptbin_Gen[i] = fBackgroundHist.make<TH2D>(Form("background_all_ptbin%d_Gen",i),
+								                 Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+								                 ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
+								                 nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
       }
-
-    /*
-    hBackgroundPPGen = fBackgroundHist.make<TH2D>("background_PP_Gen",
-						  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						       pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-						  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-    hBackgroundPMGen = fBackgroundHist.make<TH2D>("background_PM_Gen",
-						  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						       pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-						  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-    hBackgroundMPGen = fBackgroundHist.make<TH2D>("background_MP_Gen",
-						  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						       pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-						  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-
-    hBackgroundMMGen = fBackgroundHist.make<TH2D>("background_MM_Gen",
-						  Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						       pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-						  nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-    */
-
   }
-  /*
-  hBackgroundPP = fBackgroundHist.make<TH2D>("background_PP_reco",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-  hBackgroundPM = fBackgroundHist.make<TH2D>("background_PM_reco",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-  hBackgroundMP = fBackgroundHist.make<TH2D>("background_MP_reco",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
 
-  hBackgroundMM = fBackgroundHist.make<TH2D>("background_MM_reco",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-  */
+  //////////////// Define Reco (not efficiency-corrected) Background Histograms ////////////////
 
+  // Correlation function histogram
   hBackground_all = fBackgroundHist.make<TH2D>("background_all_reco",
-					       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						    pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					       nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+					          Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+						        pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+					          nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
 
-
+  // Correlation function pT-binned histograms
   // for(unsigned int i = 0; i<nptBin_; i++)
   //   {
   //     hBackground_all_ptbin[i] = fBackgroundHist.make<TH2D>(Form("background_all_ptbin%d_reco",i),
-	// 						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-	// 							 ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
-	// 						    nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+	// 						                    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+	// 							                  ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
+	// 						                    nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
   //   }
 
+  // Average-cosine event-average histograms (for numerator)
   for(unsigned int i = 2; i<nHarmonic+1; i++)
     {
-      hBackground_all_evtavgcos_n_[i] = fBackgroundHist.make<TH1D>(Form("background_all_evtavgcos_n_%d_reco",i),
-  						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
-  							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-  						    navgcosbin, avgcosbinLow, avgcosbinHigh);
+      hBackground_all_reco_evtavgcos_n_[i] = fBackgroundHist.make<TH1D>(Form("background_all_reco_evtavgcos_n_%d",i),
+  						                          Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+  							                        pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                          navgcosbin, avgcosbinLow, avgcosbinHigh);
     }
 
-    for(unsigned int i = 2; i<nHarmonic+1; i++)
-      {
-        hBackground_all_evtavgcos_2n_[i] = fBackgroundHist.make<TH1D>(Form("background_all_evtavgcos_2n_%d_reco",i),
-    						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(2n#Delta#phi)",
-    							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-    						    navgcosbin, avgcosbinLow, avgcosbinHigh);
-      }
+  // Average-cosine event-average histograms (for denominator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hBackground_all_reco_evtavgcos_2n_[i] = fBackgroundHist.make<TH1D>(Form("background_all_reco_evtavgcos_2n_%d",i),
+  						                           Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(2n#Delta#phi)",
+  							                         pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                           navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
+  // Average-cosine particle-average temporary histograms (for numerator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hEVENT_background_reco_evtavgcos_n_[i] = new TH1D(Form("background_EVENT_reco_evtavgcos_n_%d",i),
+  						                            Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+  							                          pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                            navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
+  // Average-cosine particle-average temporary histograms (for denominator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hEVENT_background_reco_evtavgcos_2n_[i] = new TH1D(Form("background_EVENT_reco_evtavgcos_2n_%d",i),
+  						                             Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+  							                           pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                             navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
 
+  //////////////// Define Recocor (efficiency-corrected) Background Histograms ////////////////
 
-    for(unsigned int i = 2; i<nHarmonic+1; i++)
-      {
-        hEVENT_background_evtavgcos_n_[i] = fSignalHist.make<TH1D>(Form("background_EVENT_evtavgcos_n_%d_reco",i),
-    						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
-    							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-    						    navgcosbin, avgcosbinLow, avgcosbinHigh);
-      }
-    for(unsigned int i = 2; i<nHarmonic+1; i++)
-      {
-        hEVENT_background_evtavgcos_2n_[i] = fSignalHist.make<TH1D>(Form("background_EVENT_evtavgcos_2n_%d_reco",i),
-    						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
-    							  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-    						    navgcosbin, avgcosbinLow, avgcosbinHigh);
-      }
-
-
-  /*
-  //Reco corrected
-  hBackgroundPP_corr = fBackgroundHist.make<TH2D>("background_PP_recocor",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-  hBackgroundPM_corr = fBackgroundHist.make<TH2D>("background_PM_recocor",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-  hBackgroundMP_corr = fBackgroundHist.make<TH2D>("background_MP_recocor",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-
-  hBackgroundMM_corr = fBackgroundHist.make<TH2D>("background_MM_recocor",
-					     Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-						  pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-					     nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
-
-  */
-
+  // Correlation function histogram
   hBackground_all_corr = fBackgroundHist.make<TH2D>("background_all_recocor",
-						    Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-							 pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
-						    nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+						             Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+							           pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+						             nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
 
+  // Correlation function pT-binned histograms
   // for(unsigned int i = 0; i<nptBin_; i++)
   //   {
   //     hBackground_all_ptbin_corr[i] = fBackgroundHist.make<TH2D>(Form("background_all_ptbin%d_recocor",i),
-	// 							Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
-	// 							     ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
-	// 							nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
+	// 							                       Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;#Delta#eta;#Delta#phi",
+	// 							                       ptbining_[i], ptbining_[i+1], pTmin_ass, pTmax_ass),
+	// 							                       nEtaBins + 1, minEta, maxEta, nPhiBins - 1, minPhi, maxPhi );
   //
   //   }
 
+  // Average-cosine event-average histograms (for numerator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hBackground_all_recocor_evtavgcos_n_[i] = fBackgroundHist.make<TH1D>(Form("background_all_recocor_evtavgcos_n_%d",i),
+  						                          Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+  							                        pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                          navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
 
-  /*
-  hbkg_PM_dphi_eff = fBackgroundHist.make<TProfile>("hbkg_PM_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
-  hbkg_MP_dphi_eff = fBackgroundHist.make<TProfile>("hbkg_MP_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
-  hbkg_MM_dphi_eff = fBackgroundHist.make<TProfile>("hbkg_MM_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
-  hbkg_PP_dphi_eff = fBackgroundHist.make<TProfile>("hbkg_PP_dphi_eff","", nPhiBins - 1, minPhi, maxPhi, 0., 2.);
-  */
+  // Average-cosine event-average histograms (for denominator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hBackground_all_recocor_evtavgcos_2n_[i] = fBackgroundHist.make<TH1D>(Form("background_all_recocor_evtavgcos_2n_%d",i),
+  						                           Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(2n#Delta#phi)",
+  							                         pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                           navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
+  // Average-cosine particle-average temporary histograms (for numerator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hEVENT_background_recocor_evtavgcos_n_[i] = new TH1D(Form("background_EVENT_recocor_evtavgcos_n_%d",i),
+  						                            Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+  							                          pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                            navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
+  // Average-cosine particle-average temporary histograms (for denominator)
+  for(unsigned int i = 2; i<nHarmonic+1; i++)
+    {
+      hEVENT_background_recocor_evtavgcos_2n_[i] = new TH1D(Form("background_EVENT_recocor_evtavgcos_2n_%d",i),
+  						                             Form("%1.1f<p_{T}^{trg}<%1.1f GeV/c, %1.1f<p_{T}^{ass}<%1.1f GeV/c;cos(n#Delta#phi)",
+  							                           pTmin_trg, pTmax_trg, pTmin_ass, pTmax_ass),
+  						                             navgcosbin, avgcosbinLow, avgcosbinHigh);
+    }
+
 }
 
 AnaAvgCos::~AnaAvgCos()
@@ -840,39 +760,41 @@ void AnaAvgCos::endJob()
    std::cout<< "Finish running correlation analysis!" << std::endl;
 
 
-   std::ofstream output_File;
-   output_File.open("harmonix_output.txt");
+   //--------- output event averages of signal and background cosines and the final harmonics to file ---------//
 
-   const Int_t nHarmonic = 12;
-
-   for(unsigned int n = 2; n<nHarmonic+1; n++)
-     {
-       double mean_signal = hSignal_all_evtavgcos_n_[n]->GetMean();
-       output_File << "Signal average for n=" << n << ": "<< mean_signal << std::endl;
-     }
-
-   for(unsigned int n = 2; n<nHarmonic+1; n++)
-     {
-       double mean_background = hBackground_all_evtavgcos_n_[n]->GetMean();
-       output_File << "Background average for n=" << n << ": "<< mean_background << std::endl;
-     }
-
-   for(unsigned int n = 2; n<nHarmonic+1; n++)
-     {
-       double mean_denom = hBackground_all_evtavgcos_2n_[n]->GetMean();
-       output_File << "Denominator average for n=" << n << ": "<< mean_denom << std::endl;
-     }
-
-   for(unsigned int n = 2; n<nHarmonic+1; n++)
-     {
-       double mean_signal = hSignal_all_evtavgcos_n_[n]->GetMean();
-       double mean_background = hBackground_all_evtavgcos_n_[n]->GetMean();
-       double mean_denom = hBackground_all_evtavgcos_2n_[n]->GetMean();
-
-       double vn_delta = (mean_signal - mean_background)/(1 + mean_denom);
-
-       output_File << "vn for n=" << n << ": "<< sqrt(std::abs(vn_delta)) << std::endl;
-     }
+   // std::ofstream output_File;
+   // output_File.open("harmonix_output.txt");
+   // 
+   // const Int_t nHarmonic = 12;
+   //
+   // for(unsigned int n = 2; n<nHarmonic+1; n++)
+   //   {
+   //     double mean_signal = hSignal_all_recocor_evtavgcos_n_[n]->GetMean();
+   //     output_File << "Signal average for n=" << n << ": "<< mean_signal << std::endl;
+   //   }
+   //
+   // for(unsigned int n = 2; n<nHarmonic+1; n++)
+   //   {
+   //     double mean_background = hBackground_all_recocor_evtavgcos_n_[n]->GetMean();
+   //     output_File << "Background average for n=" << n << ": "<< mean_background << std::endl;
+   //   }
+   //
+   // for(unsigned int n = 2; n<nHarmonic+1; n++)
+   //   {
+   //     double mean_denom = hBackground_all_recocor_evtavgcos_2n_[n]->GetMean();
+   //     output_File << "Denominator average for n=" << n << ": "<< mean_denom << std::endl;
+   //   }
+   //
+   // for(unsigned int n = 2; n<nHarmonic+1; n++)
+   //   {
+   //     double mean_signal = hSignal_all_recocor_evtavgcos_n_[n]->GetMean();
+   //     double mean_background = hBackground_all_recocor_evtavgcos_n_[n]->GetMean();
+   //     double mean_denom = hBackground_all_recocor_evtavgcos_2n_[n]->GetMean();
+   //
+   //     double vn_delta = (mean_signal - mean_background)/(1 + mean_denom);
+   //
+   //     output_File << "effcorr vn for n=" << n << ": "<< sqrt(std::abs(vn_delta)) << std::endl;
+   //   }
 
 }
 
@@ -1000,17 +922,7 @@ void AnaAvgCos::LoopTracks(const edm::Event& iEvent, const edm::EventSetup& iSet
                                bool istrg, int evtclass)
 {
 
-   //edm::Handle<std::vector<float>> mvaoutput;
-   //iEvent.getByToken(mvaSrc, mvaoutput);
 
-// Get track collection by token
-   //edm::Handle< reco::TrackCollection > tracks;
-   //iEvent.getByToken(trackTags, tracks);
-   //if( !tracks->size() )
-   //{
-   //    edm::LogWarning ("Missing Collection") <<"Invalid or empty track collection!";
-   //    return;
-   //}
 
    //track collection
    auto trks = iEvent.getHandle( tracksToken_ );
@@ -1132,7 +1044,6 @@ void AnaAvgCos::LoopTracks(const edm::Event& iEvent, const edm::EventSetup& iSet
        hetadistMinus_corr->Fill(eta, eff2);
      }
 
-
      //AssignpTbins(pt, eta, phi, charge, eff1, eff2,  istrg, kFALSE );
      AssignpTbins(pt, eta, phi, charge, eff, eff,  istrg, kFALSE );
 
@@ -1166,29 +1077,7 @@ void AnaAvgCos::LoopTracks(const edm::Event& iEvent, const edm::EventSetup& iSet
 }
 //=========================================================================================
 
-//=========================================================================================
-// double AnaAvgCos::GetEffWeight(double eta, double pt, int evtclass)
-// {
-//   double effweight = 1.0;
-//   if(evtclass == -1)
-//     {
-//       effweight = heff[0]->GetBinContent(heff[0]->FindBin(eta,pt));
-//     }
-//   else
-//     {
-//       int centIdx = 0;
-//       for(int icent = 0; icent < static_cast<int>(effCorrBinMin.size()); ++icent)
-// 	{
-// 	  if(evtclass >= effCorrBinMin[icent]*2 && evtclass < effCorrBinMax[icent]*2)
-// 	    {
-// 	      centIdx = icent;
-// 	      continue;
-// 	    }
-// 	}
-//       effweight = heff[centIdx]->GetBinContent(heff[centIdx]->GetXaxis()->FindBin(eta), heff[centIdx]->GetYaxis()->FindBin(pt));
-//     }
-//   return effweight;
-// }
+
 
 //=========================================================================================
 //
@@ -1329,6 +1218,7 @@ void AnaAvgCos::FillHistsSignal(int ievt, bool isGen)
   double nMult_corr_trg = evtVec[ievt].nMultCorrVect_trg[jj];
 
   const Int_t nHarmonic = 12;
+  //double total_pairs = 0;
 
   for( unsigned int itrg = 0; itrg < ntrgsize; itrg++ )
     {
@@ -1430,13 +1320,17 @@ void AnaAvgCos::FillHistsSignal(int ievt, bool isGen)
 	  hSignal_all_corr->Fill( fabs(deltaEta),deltaPhi2, 1.0*DptDpt/4.0 / effweight);
 	  hSignal_all_corr->Fill(-fabs(deltaEta),deltaPhi2, 1.0*DptDpt/4.0 / effweight);
 
+    // Average-cosine calculation, fill event histograms
     if( absDelEta > 2)
     {
       for(unsigned int n = 2; n<nHarmonic+1; n++)
         {
-          double cosnphi = TMath::Cos(n*std::abs(deltaPhi))*1.0*DptDpt; ///4.0/effweight;
-          hEVENT_signal_evtavgcos_n_[n]->Fill(cosnphi);
+          double cosnphi = TMath::Cos(n*std::abs(deltaPhi))*1.0*DptDpt;
+          hEVENT_signal_reco_evtavgcos_n_[n]->Fill(cosnphi);
+          hEVENT_signal_recocor_evtavgcos_n_[n]->Fill(cosnphi,1.0/effweight);
         }
+      //total_pairs+= 1.0/effweight;
+      //std::cout << "The efficiency weight for this pair is: " << effweight << std::endl;
     }
 
 	  // hSignal_all_ptbin[kpttrig]->Fill( fabs(deltaEta),deltaPhi,  1.0*DptDpt/4.0);
@@ -1455,18 +1349,36 @@ void AnaAvgCos::FillHistsSignal(int ievt, bool isGen)
 
     }//ntrg----
 
+    // Average-cosine calculation, fill event-average histograms
     for(unsigned int n = 2; n<nHarmonic+1; n++)
       {
-        double cosnphi_avg = hEVENT_signal_evtavgcos_n_[n]->GetMean();
-        hSignal_all_evtavgcos_n_[n]->Fill(cosnphi_avg);
+        double cosnphi_avg_reco = hEVENT_signal_reco_evtavgcos_n_[n]->GetMean();
+        double cosnphi_avg_recocor = hEVENT_signal_recocor_evtavgcos_n_[n]->GetMean();
+        //double cosnphi_sum = cosnphi_avg*hEVENT_signal_reco_evtavgcos_n_[n]->GetEntries();
+
+        hSignal_all_reco_evtavgcos_n_[n]->Fill(cosnphi_avg_reco);
+        hSignal_all_recocor_evtavgcos_n_[n]->Fill(cosnphi_avg_recocor);
+
+      // if (n == 2)
+      // {
+      // //  std::cout << "Average of signal entries in this event for n=" << n << ": "<< cosnphi_avg << std::endl;
+      //   //std::cout << "Number of unweighted pairs in this event for n=" << n << ": "<< hEVENT_signal_evtavgcos_n_[n]->Integral() << std::endl;
+      // //  std::cout << "Number of weighted pairs/entries in this event for n=" << n << ": "<< hEVENT_signal_evtavgcos_n_[n]->GetEntries() << std::endl;
+      //   //std::cout << "Sum of all signal entries in this event for n=" << n << ": "<< cosnphi_sum << std::endl;
+      // //  std::cout << "Number of weighted pairs in this event for n=" << n << ": "<< total_pairs << std::endl;
+      // //  std::cout << "Weighted average of signal entries in this event for n=" << n << ": "<< cosnphi_sum/total_pairs << std::endl;
+      //   }
+
       }
 
+    // reset event histograms for average-cosine calculation
     for(unsigned int n = 2; n<nHarmonic+1; n++)
       {
-        hEVENT_signal_evtavgcos_n_[n]->Reset();
+        hEVENT_signal_reco_evtavgcos_n_[n]->Reset();
+        hEVENT_signal_recocor_evtavgcos_n_[n]->Reset();
     }
 
-
+    //std::cout << "Number of weighted pairs in this event: "<< total_pairs << std::endl;
 
 }//--ievt
 
@@ -1489,6 +1401,7 @@ void AnaAvgCos::FillHistsBackground(int ievt_trg, int jevt_ass, bool isGen)
   double nMult_corr_trg = evtVec[ievt_trg].nMultCorrVect_trg[kk];
 
   const Int_t nHarmonic = 12;
+  //double total_pairs = 0;
 
   //std::cout<<" ntrgsize value=" << ntrgsize <<std::endl;
   for( unsigned int itrg = 0; itrg < ntrgsize; itrg++ )
@@ -1590,19 +1503,25 @@ void AnaAvgCos::FillHistsBackground(int ievt_trg, int jevt_ass, bool isGen)
 	    hBackground_all_corr->Fill( absDelEta, deltaPhi2,     1.0/4.0/effweight );
 	    hBackground_all_corr->Fill( -1.*absDelEta, deltaPhi2, 1.0/4.0/effweight );
 
+      // Average-cosine calculation, fill event histograms
       if( absDelEta > 2)
       {
+        // numerator
         for(unsigned int n = 2; n<nHarmonic+1; n++)
           {
-            double cosnphi = TMath::Cos(n*std::abs(deltaPhi))*1.0*DptDpt; ///4.0/effweight;
-            hEVENT_background_evtavgcos_n_[n]->Fill(cosnphi);
-          }
+            double cosnphi = TMath::Cos(n*std::abs(deltaPhi))*1.0*DptDpt;
+            hEVENT_background_reco_evtavgcos_n_[n]->Fill(cosnphi);
+            hEVENT_background_recocor_evtavgcos_n_[n]->Fill(cosnphi,1.0/effweight);
 
+          }
+        // denominator
         for(unsigned int n = 2; n<nHarmonic+1; n++)
           {
-            double cosn2phi = TMath::Cos(2*n*std::abs(deltaPhi))*1.0*DptDpt; ///4.0/effweight;
-            hEVENT_background_evtavgcos_2n_[n]->Fill(cosn2phi);
+            double cosn2phi = TMath::Cos(2*n*std::abs(deltaPhi))*1.0*DptDpt;
+            hEVENT_background_reco_evtavgcos_2n_[n]->Fill(cosn2phi);
+            hEVENT_background_recocor_evtavgcos_2n_[n]->Fill(cosn2phi,1.0/effweight);
           }
+        //total_pairs+= 1.0/effweight;
       }
 
 	    // hBackground_all_ptbin[kpttrig]->Fill( absDelEta, deltaPhi,      1.0/4.0 );
@@ -1619,40 +1538,31 @@ void AnaAvgCos::FillHistsBackground(int ievt_trg, int jevt_ass, bool isGen)
 	}//jass--
     }//trg
 
+    // Average-cosine calculation, fill event-average histograms
     for(unsigned int n = 2; n<nHarmonic+1; n++)
       {
-        double cosnphi_avg = hEVENT_background_evtavgcos_n_[n]->GetMean();
-        double cosn2phi_avg = hEVENT_background_evtavgcos_2n_[n]->GetMean();
-        hBackground_all_evtavgcos_n_[n]->Fill(cosnphi_avg);
-        hBackground_all_evtavgcos_2n_[n]->Fill(cosn2phi_avg);
+        // numerator
+        double cosnphi_avg_reco = hEVENT_background_reco_evtavgcos_n_[n]->GetMean();
+        double cosnphi_avg_recocor = hEVENT_background_recocor_evtavgcos_n_[n]->GetMean();
+        // denominator
+        double cosn2phi_avg_reco = hEVENT_background_reco_evtavgcos_2n_[n]->GetMean();
+        double cosn2phi_avg_recocor = hEVENT_background_recocor_evtavgcos_2n_[n]->GetMean();
+
+        // numerator
+        hBackground_all_reco_evtavgcos_n_[n]->Fill(cosnphi_avg_reco);
+        hBackground_all_recocor_evtavgcos_n_[n]->Fill(cosnphi_avg_recocor);
+        // denominator
+        hBackground_all_reco_evtavgcos_2n_[n]->Fill(cosn2phi_avg_reco);
+        hBackground_all_recocor_evtavgcos_2n_[n]->Fill(cosn2phi_avg_recocor);
       }
 
+    // reset event histograms for average-cosine calculation
     for(unsigned int n = 2; n<nHarmonic+1; n++)
       {
-        hEVENT_background_evtavgcos_n_[n]->Reset();
-        hEVENT_background_evtavgcos_2n_[n]->Reset();
+        hEVENT_background_reco_evtavgcos_n_[n]->Reset();
+        hEVENT_background_recocor_evtavgcos_2n_[n]->Reset();
     }
 }//----i,j event
-
-
-//-------------------------------------------
-// double AnaAvgCos::getEff(const TLorentzVector pvector, int evtclass)
-// {
-//    double effweight = 1.0;
-//    for(int i_cf=0; i_cf < static_cast<int>(effCorrBinMin.size()); i_cf++) if(evtclass >= effCorrBinMin[i_cf] && evtclass < effCorrBinMax[i_cf]) {
-//        effweight = heff[i_cf]->GetBinContent(
-// 					      heff[i_cf]->GetXaxis()->FindBin(pvector.Eta()),
-// 					      heff[i_cf]->GetYaxis()->FindBin(pvector.Pt())
-// 					      );
-//      }
-//    return effweight;
-//    }
-
- //------------------------------------------------
-
-
-//}
-//}
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(AnaAvgCos);
