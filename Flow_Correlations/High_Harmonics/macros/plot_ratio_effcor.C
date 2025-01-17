@@ -59,12 +59,12 @@ void plot_ratio_effcor() {
 
   ////////// Analyze the avgcos method output root file to get the vn
 
-  TFile*f = new TFile ("./results_avg_cos/higherHarmonics_PbPb_2pc_final_test_run_2k.root"); //higherHarmonics_PbPb_2pc_test_run_3k_effcor.root
+  TFile*f = new TFile ("../test/interactive/higherHarmonics_PbPb_2pc_final_test_run_2k.root"); //higherHarmonics_PbPb_2pc_test_run_3k_effcor.root
 
-  TDirectory*dirG1d= (TDirectory*)f->Get(Form("defaultAnalysis_%d%d",centmin, centmax));
+  TDirectory* dirG1d= (TDirectory*)f->Get(Form("defaultAnalysis_%d%d",centmin, centmax));
 
-  TDirectory*dir1= (TDirectory*)dirG1d->Get("Signal");
-  TDirectory*dir2= (TDirectory*)dirG1d->Get("Background");
+  TDirectory* dir1= (TDirectory*)dirG1d->Get("Signal");
+  TDirectory* dir2= (TDirectory*)dirG1d->Get("Background");
 
   // no eff. cor.
   TH1D* hSignal_all_reco_evtavgcos_n_[nBin];
@@ -81,16 +81,22 @@ void plot_ratio_effcor() {
 
     // no eff. cor.
     hSignal_all_reco_evtavgcos_n_[n_i] = (TH1D*)dir1->Get(Form("signal_all_reco_evtavgcos_n_%d", n_i));
-    hBackground_all_reco_evtavgcos_n_[n_i] = (TH1D*)dir2->Get(Form("background_all_reco_evtavgcos_n_%d", n_i));
-    hBackground_all_reco_evtavgcos_2n_[n_i] = (TH1D*)dir2->Get(Form("background_all_reco_evtavgcos_2n_%d", n_i));
+    //hBackground_all_reco_evtavgcos_n_[n_i] = (TH1D*)dir2->Get(Form("background_all_reco_evtavgcos_n_%d", n_i));
+    //hBackground_all_reco_evtavgcos_2n_[n_i] = (TH1D*)dir2->Get(Form("background_all_reco_evtavgcos_2n_%d", n_i));
+    hBackground_all_reco_evtavgcos_n_[n_i] = (TH1D*)f->Get(Form("defaultAnalysis_510/Background/background_all_reco_evtavgcos_n_%d", n_i));
+    hBackground_all_reco_evtavgcos_2n_[n_i] = (TH1D*)f->Get(Form("defaultAnalysis_510/Background/background_all_reco_evtavgcos_2n_%d", n_i));
 
     // eff. cor
     hSignal_all_recocor_evtavgcos_n_[n_i] = (TH1D*)dir1->Get(Form("signal_all_recocor_evtavgcos_n_%d", n_i));
-    hBackground_all_recocor_evtavgcos_n_[n_i] = (TH1D*)dir2->Get(Form("background_all_recocor_evtavgcos_n_%d", n_i));
-    hBackground_all_recocor_evtavgcos_2n_[n_i] = (TH1D*)dir2->Get(Form("background_all_recocor_evtavgcos_2n_%d", n_i));
+    //hBackground_all_recocor_evtavgcos_n_[n_i] = (TH1D*)dir2->Get(Form("background_all_recocor_evtavgcos_n_%d", n_i));
+    //hBackground_all_recocor_evtavgcos_2n_[n_i] = (TH1D*)dir2->Get(Form("background_all_recocor_evtavgcos_2n_%d", n_i));
+    hBackground_all_recocor_evtavgcos_n_[n_i] = (TH1D*)f->Get(Form("defaultAnalysis_510/Background/background_all_recocor_evtavgcos_n_%d", n_i));
+    hBackground_all_recocor_evtavgcos_2n_[n_i] = (TH1D*)f->Get(Form("defaultAnalysis_510/Background/background_all_recocor_evtavgcos_2n_%d", n_i));
 
   }
 
+
+ 
   // Claculate vn
   for(unsigned int n_i = 2; n_i<nBin+1; n_i++){
 
