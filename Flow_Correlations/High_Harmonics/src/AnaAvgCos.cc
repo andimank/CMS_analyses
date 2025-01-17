@@ -137,7 +137,7 @@ AnaAvgCos::AnaAvgCos(const edm::ParameterSet& iConfig) :
   Double_t rapbining[nrapBin+1] = {-2.4, -2.0, -1.6, -1.4, -1.3, -1.2, -1.0, -0.8, -0.4, 0.0, 0.4, 0.8, 1.0, 1.2, 1.3, 1.4, 1.6, 2.0, 2.4};
 
 
-  const Int_t nHarmonic = 12;
+  const Int_t nHarmonic = 20;
 
   int navgcosbin = 100;
   int avgcosbinLow = -10;
@@ -765,7 +765,7 @@ void AnaAvgCos::endJob()
    // std::ofstream output_File;
    // output_File.open("harmonix_output.txt");
    // 
-   // const Int_t nHarmonic = 12;
+   // const Int_t nHarmonic = 20;
    //
    // for(unsigned int n = 2; n<nHarmonic+1; n++)
    //   {
@@ -1217,7 +1217,7 @@ void AnaAvgCos::FillHistsSignal(int ievt, bool isGen)
   unsigned int nasssize = evtVec[ievt].pVect_ass[jj].size();
   double nMult_corr_trg = evtVec[ievt].nMultCorrVect_trg[jj];
 
-  const Int_t nHarmonic = 12;
+  const Int_t nHarmonic = 20;
   //double total_pairs = 0;
 
   for( unsigned int itrg = 0; itrg < ntrgsize; itrg++ )
@@ -1400,7 +1400,7 @@ void AnaAvgCos::FillHistsBackground(int ievt_trg, int jevt_ass, bool isGen)
   unsigned int nasssize = evtVec[jevt_ass].pVect_ass[kk].size();
   double nMult_corr_trg = evtVec[ievt_trg].nMultCorrVect_trg[kk];
 
-  const Int_t nHarmonic = 12;
+  const Int_t nHarmonic = 20;
   //double total_pairs = 0;
 
   //std::cout<<" ntrgsize value=" << ntrgsize <<std::endl;
