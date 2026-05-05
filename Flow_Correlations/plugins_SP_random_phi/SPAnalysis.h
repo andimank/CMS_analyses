@@ -1,0 +1,106 @@
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TTree.h"
+
+#include "TComplex.h"
+#include <vector>
+#include <TVector3.h>
+
+#include "TRandom.h"
+#include "TRandom3.h"
+#include "TMath.h"
+
+  static const int nCentTableBins = 200;
+  //static const int nCentBin = 17;
+  static const int nCentBin = 2;
+  static const int nHarmonics = 5;
+  static const int nPtBin = 23; //32
+  //double cBin[nCentBin+1]={0,5,10,15,20,25,30,35,40,50,60,70,80,90,100};
+  //double cBin[nCentBin+1]={0, 1, 2, 5, 10, 15, 20, 25, 30, 35,40,45,50,55,60, 65,70,80};
+  //double cBin[nCentBin+1]={0, 10, 20, 30, 40, 50, 60};
+  double cBin[nCentBin+1]={0, 30, 60};
+  double ptBins[nPtBin+1]={0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 16.0, 20.0, 30.0, 50.0, 20000.0};
+  //double ptBins[nPtBin+1]={0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 60.0, 70.0, 90.0, 110.0, 20000.0};
+//new oo
+//double oo_binBoundaries[nCentTableBins+1] ={0,0.541378,1.08276,1.62413,2.16551,2.70689,3.24827,3.78965,4.33102,4.8724,5.41378,5.95516,6.49654,7.03791,7.57929,8.12067,8.66205,9.20343,9.7448,10.2862,10.6892,11.0741,11.4734,11.8737,12.2821,12.695,13.1136,13.5454,13.99,14.4409,14.8968,15.3647,15.838,16.3159,16.8086,17.3143,17.8365,18.3655,18.9041,19.4482,20,20.5642,21.1378,21.7243,22.3096,22.9054,23.5146,24.1298,24.7489,25.3876,26.0376,26.6907,27.348,28.0133,28.6944,29.3832,30.0649,30.7649,31.485,32.2074,32.9488,33.6865,34.4457,35.2135,35.9879,36.7656,37.5649,38.3795,39.1949,40.0292,40.877,41.719,42.5721,43.451,44.3411,45.2527,46.1525,47.063,47.9941,48.9363,49.8973,50.87,51.858,52.8616,53.8758,54.9175,55.9401,56.9886,58.0605,59.1483,60.2559,61.3781,62.5076,63.6562,64.8279,66.0015,67.1865,68.4196,69.6452,70.8929,72.1649,73.4428,74.7654,76.0837,77.4235,78.7842,80.164,81.5679,82.9964,84.4318,85.8985,87.3895,88.911,90.4623,92.0165,93.5991,95.2188,96.8358,98.4656,100.143,101.839,103.569,105.284,107.045,108.826,110.651,112.483,114.313,116.184,118.087,120.066,122.099,124.083,126.107,128.177,130.237,132.371,134.527,136.726,138.911,141.181,143.449,145.736,148.064,150.444,152.885,155.348,157.827,160.349,162.876,165.43,168.033,170.678,173.333,176.052,178.847,181.645,184.471,187.328,190.287,193.25,196.249,199.342,202.482,205.619,208.853,212.118,215.47,218.875,222.287,225.757,229.332,232.932,236.633,240.344,244.076,248,251.867,255.945,260.121,264.359,268.691,273.163,277.794,282.536,287.449,292.526,297.769,303.385,309.236,315.391,321.889,329.017,336.648,344.936,354.288,365.01,377.883,394.624,420.442,10000}; // low
+//double oo_binBoundaries[nCentTableBins+1] ={0,1.0623,2.1246,3.1869,4.2492,5.3115,6.3738,7.4361,8.4984,9.5607,10.4345,10.8026,11.1732,11.5527,11.9338,12.3235,12.7163,13.1145,13.5247,13.9469,14.3744,14.8082,15.2496,15.6983,16.1521,16.6147,17.089,17.5787,18.0805,18.5861,19.1013,19.6179,20.1493,20.6856,21.2339,21.792,22.3494,22.9163,23.4953,24.0806,24.6667,25.2734,25.8874,26.5109,27.131,27.7642,28.408,29.0561,29.7045,30.3602,31.0347,31.7224,32.4139,33.12,33.8219,34.5473,35.2788,36.0147,36.7539,37.5136,38.2888,39.0606,39.8492,40.6593,41.4581,42.2655,43.0876,43.9331,44.7881,45.6495,46.5158,47.38,48.2636,49.1723,50.0919,51.0152,51.9579,52.9127,53.8772,54.8677,55.8398,56.8338,57.8478,58.8823,59.923,60.9888,62.0584,63.1451,64.2508,65.366,66.4933,67.6275,68.8032,69.969,71.1617,72.3747,73.5936,74.8521,76.1075,77.3798,78.6718,79.983,81.3165,82.6686,84.029,85.4145,86.8261,88.261,89.7196,91.2081,92.6863,94.209,95.75,97.2984,98.8457,100.45,102.069,103.71,105.343,107.017,108.708,110.444,112.186,113.918,115.69,117.491,119.362,121.276,123.166,125.087,127.017,128.967,130.978,133.014,135.065,137.151,139.242,141.398,143.56,145.738,147.95,150.206,152.521,154.869,157.199,159.61,162.012,164.428,166.879,169.369,171.893,174.439,177.06,179.719,182.391,185.09,187.802,190.635,193.448,196.3,199.245,202.229,205.203,208.275,211.367,214.539,217.751,220.983,224.268,227.634,231.043,234.46,238.03,241.571,245.161,248.876,252.577,256.495,260.479,264.505,268.62,272.853,277.255,281.76,286.424,291.165,296.143,301.332,306.797,312.504,318.506,324.975,331.994,339.319,347.506,356.74,367.343,380.13,396.568,422.106,10000}; //high
+double oo_binBoundaries[nCentTableBins+1] ={0,0.717572,1.43514,2.15272,2.87029,3.58786,4.30543,5.023,5.74057,6.45815,7.17572,7.89329,8.61086,9.32843,10.046,10.5615,10.9358,11.3222,11.7114,12.1054,12.5071,12.9114,13.3242,13.7529,14.1895,14.6323,15.0788,15.5384,16.0017,16.4718,16.954,17.4529,17.965,18.4818,19.0081,19.5384,20.0798,20.6295,21.1904,21.7624,22.3333,22.9144,23.5082,24.108,24.7103,25.3327,25.9643,26.6021,27.2404,27.8889,28.551,29.2201,29.8838,30.5609,31.2582,31.959,32.6755,33.3996,34.127,34.8736,35.624,36.3835,37.1513,37.9462,38.7306,39.5312,40.3522,41.1784,41.9996,42.8382,43.7007,44.5735,45.4614,46.3438,47.2291,48.1364,49.0614,49.9993,50.9485,51.9135,52.8921,53.8808,54.8964,55.893,56.9136,57.9568,59.0177,60.0888,61.1833,62.2824,63.399,64.5337,65.6807,66.8337,68.0214,69.219,70.4243,71.651,72.9014,74.165,75.4546,76.7537,78.0703,79.4045,80.7569,82.1322,83.5298,84.9421,86.3744,87.8423,89.3304,90.8548,92.361,93.9159,95.4992,97.0799,98.6655,100.303,101.96,103.647,105.32,107.036,108.77,110.55,112.332,114.116,115.936,117.785,119.708,121.683,123.605,125.589,127.588,129.583,131.654,133.746,135.887,138.016,140.191,142.401,144.623,146.867,149.14,151.514,153.909,156.277,158.74,161.209,163.662,166.177,168.728,171.298,173.901,176.575,179.302,182.038,184.793,187.576,190.47,193.355,196.279,199.296,202.355,205.406,208.567,211.746,215.007,218.296,221.624,224.981,228.464,231.972,235.5,239.147,242.785,246.538,250.308,254.2,258.246,262.353,266.531,270.819,275.228,279.794,284.51,289.356,294.368,299.561,305.114,310.888,316.984,323.451,330.516,337.981,346.265,355.527,366.193,379.001,395.659,421.298,10000};  //default
+//new nene
+double nene_binBoundaries[nCentTableBins+1] ={0,0.796165,1.59233,2.3885,3.18466,3.98083,4.77699,5.57316,6.36932,7.16549,7.96165,8.75782,9.55398,10.3419,10.7459,11.1487,11.5557,11.9765,12.3958,12.8224,13.2575,13.7055,14.169,14.6409,15.131,15.6285,16.1319,16.6369,17.1592,17.6922,18.2389,18.7954,19.3801,19.9707,20.5712,21.181,21.795,22.4167,23.0559,23.688,24.3333,25.0232,25.6847,26.366,27.0754,27.7975,28.5169,29.2585,30.0149,30.7655,31.5565,32.3414,33.1446,33.9552,34.7554,35.5799,36.4235,37.2709,38.1186,38.9817,39.876,40.7619,41.6532,42.5763,43.5095,44.4509,45.441,46.4229,47.4092,48.4152,49.4382,50.4775,51.5114,52.5722,53.6107,54.7073,55.8258,56.9313,58.0735,59.2244,60.3905,61.5803,62.7754,63.9791,65.207,66.4599,67.7295,69,70.2905,71.5994,72.9536,74.3647,75.7388,77.1391,78.6117,80.0714,81.5776,83.0758,84.5599,86.1067,87.6935,89.2532,90.8864,92.5324,94.1888,95.8598,97.5337,99.3035,101.063,102.856,104.653,106.51,108.354,110.208,112.087,113.988,116.017,118.019,120.009,122.028,124.098,126.204,128.262,130.478,132.636,134.851,137.051,139.344,141.672,143.971,146.403,148.866,151.302,153.751,156.341,158.886,161.498,164.124,166.743,169.48,172.182,174.888,177.683,180.585,183.401,186.342,189.27,192.243,195.327,198.388,201.58,204.781,208.052,211.405,214.7,217.998,221.41,224.906,228.41,231.989,235.662,239.378,243.093,246.897,250.762,254.688,258.664,262.633,266.688,270.844,274.934,279.274,283.731,288.117,292.555,297.233,302.007,306.79,311.65,316.716,321.818,327.039,332.417,337.989,343.573,349.285,355.543,362.012,368.619,375.276,382.614,390.501,398.567,407.709,417.137,428.164,440.928,456.362,476.098,505.708,10000};
+
+  TH1D* hQhfPlusX[nCentBin][nHarmonics];
+  TH1D* hQhfPlusY[nCentBin][nHarmonics];
+  TH1D* hQhfMinusX[nCentBin][nHarmonics];
+  TH1D* hQhfMinusY[nCentBin][nHarmonics];
+  TH1D* hQhfMinusPlusX[nCentBin][nHarmonics];
+  TH1D* hQhfMinusPlusY[nCentBin][nHarmonics];
+  TH1D* hQDEMinusPlusX[nCentBin][nHarmonics];
+  TH1D* hQDEMinusPlusY[nCentBin][nHarmonics];
+  TH1D* hQtrkPtPlusX[nCentBin][nHarmonics][nPtBin];
+  TH1D* hQtrkPtPlusY[nCentBin][nHarmonics][nPtBin];
+  TH1D* hQtrkPtMinusX[nCentBin][nHarmonics][nPtBin];
+  TH1D* hQtrkPtMinusY[nCentBin][nHarmonics][nPtBin];
+  TH1D* hQtrkMidX[nCentBin][nHarmonics];
+  TH1D* hQtrkMidY[nCentBin][nHarmonics];
+  TH1D* hQtrkPtMidX[nCentBin][nHarmonics][nPtBin];
+  TH1D* hQtrkPtMidY[nCentBin][nHarmonics][nPtBin];
+
+double meanQhfPlusX[nCentBin][nHarmonics];
+double meanQhfPlusY[nCentBin][nHarmonics];
+double meanQhfMinusX[nCentBin][nHarmonics];
+double meanQhfMinusY[nCentBin][nHarmonics];
+double meanQhfMinusPlusX[nCentBin][nHarmonics];
+double meanQhfMinusPlusY[nCentBin][nHarmonics];
+double meanQDEMinusPlusX[nCentBin][nHarmonics];
+double meanQDEMinusPlusY[nCentBin][nHarmonics];
+double meanQtrkPtPlusX[nCentBin][nHarmonics][nPtBin];
+double meanQtrkPtPlusY[nCentBin][nHarmonics][nPtBin];
+double meanQtrkPtMinusX[nCentBin][nHarmonics][nPtBin];
+double meanQtrkPtMinusY[nCentBin][nHarmonics][nPtBin];
+double meanQtrkMidX[nCentBin][nHarmonics];
+double meanQtrkMidY[nCentBin][nHarmonics];
+double meanQtrkPtMidX[nCentBin][nHarmonics][nPtBin];
+double meanQtrkPtMidY[nCentBin][nHarmonics][nPtBin];
+// comment out below if don't need re-centering
+
+double OOmeanQhfPlusX[nCentBin][nHarmonics]={{0}};
+double OOmeanQhfPlusY[nCentBin][nHarmonics]={{0}};
+double OOmeanQhfMinusX[nCentBin][nHarmonics]={{0}};
+double OOmeanQhfMinusY[nCentBin][nHarmonics]={{0}};
+double OOmeanQhfMinusPlusX[nCentBin][nHarmonics]={{0}};
+double OOmeanQhfMinusPlusY[nCentBin][nHarmonics]={{0}};
+double OOmeanQDEMinusPlusX[nCentBin][nHarmonics]={{0}};
+double OOmeanQDEMinusPlusY[nCentBin][nHarmonics]={{0}};
+double OOmeanQtrkPtPlusX[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double OOmeanQtrkPtPlusY[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double OOmeanQtrkPtMinusX[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double OOmeanQtrkPtMinusY[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double OOmeanQtrkMidX[nCentBin][nHarmonics]={{0}};
+double OOmeanQtrkMidY[nCentBin][nHarmonics]={{0}};
+double OOmeanQtrkPtMidX[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double OOmeanQtrkPtMidY[nCentBin][nHarmonics][nPtBin]={{{0}}};
+
+double NeNemeanQhfPlusX[nCentBin][nHarmonics]={{0}};
+double NeNemeanQhfPlusY[nCentBin][nHarmonics]={{0}};
+double NeNemeanQhfMinusX[nCentBin][nHarmonics]={{0}};
+double NeNemeanQhfMinusY[nCentBin][nHarmonics]={{0}};
+double NeNemeanQhfMinusPlusX[nCentBin][nHarmonics]={{0}};
+double NeNemeanQhfMinusPlusY[nCentBin][nHarmonics]={{0}};
+double NeNemeanQDEMinusPlusX[nCentBin][nHarmonics]={{0}};
+double NeNemeanQDEMinusPlusY[nCentBin][nHarmonics]={{0}};
+double NeNemeanQtrkPtPlusX[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double NeNemeanQtrkPtPlusY[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double NeNemeanQtrkPtMinusX[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double NeNemeanQtrkPtMinusY[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double NeNemeanQtrkMidX[nCentBin][nHarmonics]={{0}};
+double NeNemeanQtrkMidY[nCentBin][nHarmonics]={{0}};
+double NeNemeanQtrkPtMidX[nCentBin][nHarmonics][nPtBin]={{{0}}};
+double NeNemeanQtrkPtMidY[nCentBin][nHarmonics][nPtBin]={{{0}}};
+
+// end of comment out
+
+//#include "OOAnalysisFlow/SPAnalysis/plugins/ReCenteringOO.h"    //need to add meanQhfMinusPlusX and meanQhfMinusPlusY values in the header file, also DE
+//#include "OOAnalysisFlow/SPAnalysis/plugins/ReCenteringNeNe.h"  //need to add meanQhfMinusPlusX and meanQhfMinusPlusY values in the header file, also DE
+
+
+
